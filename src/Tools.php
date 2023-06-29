@@ -253,6 +253,47 @@ class Tools
     }
 
     /**
+     * Função responsável por requisitar token de acesso
+     *
+     * @param array $data CPF/CNPJ da empresa
+     * @param array $params Parametros adicionais para a requisição
+     *
+     * @access public
+     * @return array
+     */
+    public function tokenEmpresa(string $cpfcnpj, array $params = []) :array
+    {
+        if(empty($cpfcnpj)) {
+            throw new Exception("CPF/CNPJ não informado", 1);
+        }
+
+        $params[] = [
+            'name' => 'cpfcnpj',
+            'value' => $cpfcnpj
+        ];
+
+        try {
+            $dados = $this->get("companies/token-api", $params);
+
+            if ($dados['httpCode'] >= 200 && $dados['httpCode'] <= 299) {
+                return $dados;
+            }
+
+            if (isset($dados['body']->message)) {
+                throw new Exception($dados['body']->message, 1);
+            }
+
+            if (isset($dados['body']->errors)) {
+                throw new Exception(implode("\r\n", $dados['body']->errors), 1);
+            }
+
+            throw new Exception(json_encode($dados), 1);
+        } catch (Exception $error) {
+            throw new Exception($error, 1);
+        }
+    }
+
+    /**
      * Função responsável por retornar o saldo atual
      *
      * @access public
