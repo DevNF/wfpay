@@ -324,6 +324,125 @@ class Tools
     }
 
     /**
+     * Função responsável por verificar se o ID de uma determinada categoria está sendo usada
+     * na tabela easy_tax_categories no campo easy_category_id
+     *
+     * @param integer $id ID da categoria
+     *
+     * @access public
+     * @return boolean
+     */
+    public function buscaCategoria(int $id, array $params = []) :array
+    {
+        try {
+            $dados = $this->get("categories/$id", $params);
+
+            if ($dados['httpCode'] >= 200 && $dados['httpCode'] <= 299) {
+                return $dados;
+            }
+
+            if (isset($dados['body']->message)) {
+                throw new Exception($dados['body']->message, 1);
+            }
+
+            if (isset($dados['body']->errors)) {
+                throw new Exception(implode("\r\n", $dados['body']->errors), 1);
+            }
+
+            throw new Exception(json_encode($dados), 1);
+        } catch (Exception $error) {
+            throw new Exception($error, 1);
+        }
+    }
+
+    /**
+     * Função responsável por buscar o PJBank no WFPay
+     *
+     * @param array $params Parametros adicionais para a requisição
+     * @param string $cpfcnpj CPF/CNPJ
+     * @param integer $charge_id ID do charge
+     *
+     * @access public
+     * @return boolean
+     */
+    public function buscaPjbank(string $cpfcnpj, int $charge_id, array $params = []) :array
+    {
+        try {
+            $params = array_filter($params, function($item) {
+                return $item['name'] !== 'company_id';
+            }, ARRAY_FILTER_USE_BOTH);
+
+            if (!empty($cpfcnpj)) {
+                $params[] = [
+                    'name' => 'cpfcnpj',
+                    'value' => $cpfcnpj
+                ];
+            }
+
+            $dados = $this->get("pjbank/$charge_id", $params);
+
+            if ($dados['httpCode'] >= 200 && $dados['httpCode'] <= 299) {
+                return $dados;
+            }
+
+            if (isset($dados['body']->message)) {
+                throw new Exception($dados['body']->message, 1);
+            }
+
+            if (isset($dados['body']->errors)) {
+                throw new Exception(implode("\r\n", $dados['body']->errors), 1);
+            }
+
+            throw new Exception(json_encode($dados), 1);
+        } catch (Exception $error) {
+            throw new Exception($error, 1);
+        }
+    }
+
+    /**
+     * Função responsável por buscar as transactions no WFPay
+     *
+     * @param array $params Parametros adicionais para a requisição
+     * @param string $cpfcnpj CPF/CNPJ
+     * @param integer $charge_id ID do charge
+     * @access public
+     * @return boolean
+     */
+    public function buscaTransactions(string $cpfcnpj, int $charge_id, array $params = []) :array
+    {
+        try {
+            $params = array_filter($params, function($item) {
+                return $item['name'] !== 'company_id';
+            }, ARRAY_FILTER_USE_BOTH);
+
+            if (!empty($cpfcnpj)) {
+                $params[] = [
+                    'name' => 'cpfcnpj',
+                    'value' => $cpfcnpj
+                ];
+            }
+
+            $dados = $this->get("transactions/$charge_id", $params);
+
+            if ($dados['httpCode'] >= 200 && $dados['httpCode'] <= 299) {
+                return $dados;
+            }
+
+            if (isset($dados['body']->message)) {
+                throw new Exception($dados['body']->message, 1);
+            }
+
+            if (isset($dados['body']->errors)) {
+                throw new Exception(implode("\r\n", $dados['body']->errors), 1);
+            }
+
+            throw new Exception(json_encode($dados), 1);
+        } catch (Exception $error) {
+            throw new Exception($error, 1);
+        }
+    }
+
+    /**
      * Função responsável por retornar o resumo da empresa
      *
      * @access public
@@ -2020,13 +2139,21 @@ class Tools
      * Função responsável por retornar os dados do extrato bancário
      *
      * @param array $params Parametros adicionais para a requisição
+     * @param string $cpfcnpj Cpf ou Cnpj
      *
      * @access public
      * @return array
      */
-    public function consultaExtrato(array $params = []) :array
+    public function consultaExtrato(string $cpfcnpj, array $params = []) :array
     {
         try {
+            if (!empty($cpfcnpj)) {
+                $params[] = [
+                    'name' => 'cpfcnpj',
+                    'value' => $cpfcnpj
+                ];
+            }
+
             $dados = $this->get("extracts", $params);
 
             if ($dados['httpCode'] >= 200 && $dados['httpCode'] <= 299) {
