@@ -404,11 +404,11 @@ class Tools
      *
      * @param array $params Parametros adicionais para a requisição
      * @param string $cpfcnpj CPF/CNPJ
-     * @param integer $charge_id ID do charge
+     * @param integer $transaction_id ID do transaction
      * @access public
      * @return boolean
      */
-    public function buscaTransactions(string $cpfcnpj, int $charge_id, array $params = []) :array
+    public function buscaTransactions(string $cpfcnpj, int $transaction_id, array $params = []) :array
     {
         try {
             $params = array_filter($params, function($item) {
@@ -422,7 +422,7 @@ class Tools
                 ];
             }
 
-            $dados = $this->get("transactions/$charge_id", $params);
+            $dados = $this->get("transactions/$transaction_id", $params);
 
             if ($dados['httpCode'] >= 200 && $dados['httpCode'] <= 299) {
                 return $dados;
