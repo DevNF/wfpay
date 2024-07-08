@@ -1913,6 +1913,70 @@ class Tools
     }
 
     /**
+     * Função responsável por agendar um novo pagamento do easy
+     *
+     * @param array $data Dados do pagamento
+     * @param array $params Parametros adicionais para a requisição
+     *
+     * @access public
+     * @return array
+     */
+    public function solicitaAgendamentoPagamento(array $data, array $params = []) :array
+    {
+        try {
+            $dados = $this->post("payments/schedule", $data, $params);
+
+            if ($dados['httpCode'] >= 200 && $dados['httpCode'] <= 299) {
+                return $dados;
+            }
+
+            if (isset($dados['body']->message)) {
+                throw new Exception($dados['body']->message, 1);
+            }
+
+            if (isset($dados['body']->errors)) {
+                throw new Exception(implode("\r\n", $dados['body']->errors), 1);
+            }
+
+            throw new Exception(json_encode($dados), 1);
+        } catch (Exception $error) {
+            throw new Exception($error, 1);
+        }
+    }
+
+    /**
+     * Função responsável por agendar uma nova transferencia do easy
+     *
+     * @param array $data Dados do pagamento
+     * @param array $params Parametros adicionais para a requisição
+     *
+     * @access public
+     * @return array
+     */
+    public function solicitaAgendamentoTransferencia(array $data, array $params = []) :array
+    {
+        try {
+            $dados = $this->post("transfers/schedule", $data, $params);
+
+            if ($dados['httpCode'] >= 200 && $dados['httpCode'] <= 299) {
+                return $dados;
+            }
+
+            if (isset($dados['body']->message)) {
+                throw new Exception($dados['body']->message, 1);
+            }
+
+            if (isset($dados['body']->errors)) {
+                throw new Exception(implode("\r\n", $dados['body']->errors), 1);
+            }
+
+            throw new Exception(json_encode($dados), 1);
+        } catch (Exception $error) {
+            throw new Exception($error, 1);
+        }
+    }
+
+    /**
      * Função responsável por cancelar um pagamento
      *
      * @param int $id ID do pagamento
@@ -2485,5 +2549,39 @@ class Tools
         }
 
         return $dados;
+    }
+
+    /**
+     * Função responsável por excluir um evento critico
+     *
+     * @param array $ids
+     * @param array $params Parametros adicionais para a requisição
+     *
+     * @access public
+     * @return array
+     */
+    public function removeEventosCriticos(array $ids, array $params = []) :array
+    {
+        try {
+            $dados = $this->post("critical_events/exclude", [
+                'ids' => $ids
+            ], $params);
+
+            if ($dados['httpCode'] >= 200 && $dados['httpCode'] <= 299) {
+                return $dados;
+            }
+
+            if (isset($dados['body']->message)) {
+                throw new Exception($dados['body']->message, 1);
+            }
+
+            if (isset($dados['body']->errors)) {
+                throw new Exception(implode("\r\n", $dados['body']->errors), 1);
+            }
+
+            throw new Exception(json_encode($dados), 1);
+        } catch (Exception $error) {
+            throw new Exception($error, 1);
+        }
     }
 }
