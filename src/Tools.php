@@ -221,6 +221,38 @@ class Tools
     }
 
     /**
+     * Função responsável por cancelar uma assinatura no wfpay
+     *
+     * @param int $charge_id ID da charge
+     * @param array $params Parametros adicionais para a requisição
+     *
+     * @access public
+     * @return array
+     */
+    public function cancelaAssinaturaWfpay(int $charge_id, array $params = []) :array
+    {
+        try {
+            $dados = $this->post("companies/subscriptions/$charge_id/cancel", [], $params);
+
+            if ($dados['httpCode'] >= 0 && $dados['httpCode'] <= 299) {
+                return $dados;
+            }
+
+            if (isset($dados['body']->message)) {
+                throw new Exception($dados['body']->message, 1);
+            }
+
+            if (isset($dados['body']->errors)) {
+                throw new Exception(implode("\r\n", $dados['body']->errors), 1);
+            }
+
+            throw new Exception(json_encode($dados), 1);
+        } catch (Exception $error) {
+            throw new Exception($error, 1);
+        }
+    }
+
+    /**
      * Função responsável por cadastrar uma empresa
      *
      * @param array $data Dados da empresa
