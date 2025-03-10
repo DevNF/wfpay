@@ -2106,21 +2106,19 @@ class Tools
     /**
      * Função responsável por listar as NFSes do WFPay
      *
-     * @param int $customer_id ID do cliente
      * @param array $params Parametros adicionais para a requisição
      *
      * @access public
      * @return array
      */
-    public function listaNFSes(int $customer_id, array $params = [] ) :array
+    public function listaNFSes(array $params = [] ) :array
     {
         try {
-            $params['customer_id'] = $customer_id;
-
             $dados = $this->get("nfses", $params);
 
             if ($dados['httpCode'] >= 200 && $dados['httpCode'] <= 299) {
                 return $dados;
+
             }
 
             if (isset($dados['body']->message)) {
